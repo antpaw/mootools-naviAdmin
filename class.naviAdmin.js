@@ -37,7 +37,6 @@ var naviAdmin = new Class({
 		this.setOptions(opts);
 		
 		this.elemTree = this.options.elemTree;
-		this.lis = this.elemTree.getElements('li').addClass('item');
 		
 		this.createPosHelper();
 		
@@ -49,6 +48,8 @@ var naviAdmin = new Class({
 	},
 	
 	createPosHelper: function(){
+		this.lis = this.elemTree.getElements('li').addClass('item');
+		
 		this.elemTree.getElements('.pos_helper').dispose();
 		
 		this.droppablePlaceholder = [];
@@ -75,8 +76,10 @@ var naviAdmin = new Class({
 		this.drag = new Drag.Move(current_li, {
 			handle: event.target,
 			droppables: dropAndMoveAsChild.concat(this.droppablePlaceholder),
-			onDrag: function(element, hoverElement){
-				element.addClass('moved');
+			onStart: function(element, hoverElement){
+				element
+					.addClass('moved')
+					.getNext('li').dispose();
 			},
 			onEnter: function(element, hoverElement){
 				hoverElement.addClass('hover');
@@ -120,25 +123,25 @@ var naviAdmin = new Class({
 			]);
 			
 			hoverElement.removeClass('hover');
-			this.createPosHelper();
 		}
 		else {
 			element.erase('style').removeClass('moved');
 		}
+		this.createPosHelper();
 	},
 	getId: function(str){
 		var nameId;
-		var done = {'name': null, 'id': null};
+		var output = {'name': null, 'id': null};
 		
-		if ( ! str) return done;
+		if ( ! str) return output;
 		
 		nameId = str.match(/(.+)[-=_](.+)/);
-		if ( ! nameId) return done;
+		if ( ! nameId) return output;
 		
-		done.name = nameId[1];
-		done.id = nameId[2];
+		output.name = nameId[1];
+		output.id = nameId[2];
 		
-		return done;
+		return output;
 	},
 	
 	serialize: function(){
