@@ -43,7 +43,8 @@ var naviAdmin = new Class({
 		this.lis.each(function(elem){
 			this.options.dragSpan.clone()
 				.inject(elem.getElement('div'), 'top')
-				.addEvent('mousedown', this.initDrag.bind(this));
+				.addEvent('mousedown', this.initDrag.bind(this))
+				.addEvent('click', this.initDrag.bind(this));
 		}.bind(this));
 	},
 	
@@ -72,7 +73,7 @@ var naviAdmin = new Class({
 		this.lis.each(function(li){
 			if (current_li !== li) dropAndMoveAsChild.push(li);
 		});
-		
+	
 		this.drag = new Drag.Move(current_li, {
 			handle: event.target,
 			droppables: dropAndMoveAsChild.concat(this.droppablePlaceholder),
