@@ -31,13 +31,14 @@ var naviAdmin = new Class({
 	droppablePlaceholder: [],
 	drag: null,
 	
-	initialize: function(_options) {
+	initialize: function(_options){
 		var opts = ($type(_options) != 'object' ? {'elemTree': _options} : _options);
 		if (!$defined(opts.elemTree)) { alert('naviAdmin - no object'); return; }
 		this.setOptions(opts);
 		
 		this.elemTree = this.options.elemTree;
 		
+		this.removeListener();
 		this.createPosHelper();
 		
 		this.lis.each(function(elem){
@@ -46,6 +47,10 @@ var naviAdmin = new Class({
 				.addEvent('mousedown', this.initDrag.bind(this))
 				.addEvent('click', this.initDrag.bind(this));
 		}.bind(this));
+	},
+	removeListener: function(){
+		this.elemTree.getElements('.pos_helper').dispose();
+		this.elemTree.getElements('.drag').dispose();
 	},
 	
 	createPosHelper: function(){
@@ -154,5 +159,9 @@ var naviAdmin = new Class({
 			}
 		}.bind(this));
 		return idsPosition.join('&');
+	},
+	
+	reInit: function(){
+		this.initialize(this.options);
 	}
 });
