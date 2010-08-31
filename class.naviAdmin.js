@@ -26,10 +26,12 @@ var naviAdmin = new Class({
 		pos_helper: new Element('li', {'class': 'pos_helper'})
 	},
 	
+	version: '0.2',
 	elemTree: null,
 	lis: [],
 	droppablePlaceholder: [],
 	drag: null,
+	hoverElem: null,
 	
 	initialize: function(_options){
 		var opts = ($type(_options) != 'object' ? {'elemTree': _options} : _options);
@@ -44,16 +46,24 @@ var naviAdmin = new Class({
 		this.lis.each(function(elem){
 			this.options.dragSpan.clone()
 				.inject(elem.getElement('div'), 'top')
-				.addEvent('mousedown', this.initDrag.bind(this))
-				.addEvent('click', this.initDrag.bind(this));
+				.addEvent('mouseup', this.disableUp.bind(this))
+				.addEvent('mousedown', this.initDrag.bind(this));
 		}.bind(this));
 	},
+	
+	disableUp: function(e){
+		this.drag.stop(e);
+		this.liDropped(e.target.getParent('li'), this.hoverElem);
+	},
+	
 	removeListener: function(){
 		this.elemTree.getElements('.pos_helper').dispose();
 		this.elemTree.getElements('.drag').dispose();
 	},
 	
 	createPosHelper: function(){
+		this.hoverElem = null;
+		
 		this.lis = this.elemTree.getElements('li').addClass('item');
 		
 		this.elemTree.getElements('.pos_helper').dispose();
@@ -89,19 +99,20 @@ var naviAdmin = new Class({
 			},
 			onEnter: function(element, hoverElement){
 				hoverElement.addClass('hover');
-			},
+				this.hoverElem = hoverElement;
+			}.bind(this),
 			onLeave: function(element, hoverElement){
 				hoverElement.removeClass('hover');
-			},
-			onDrop: this.liDropped.bind(this)
+			}
 		});
 		this.elemTree.addClass('drag_active');
 		this.drag.start(event);
 	},
 	
-	liDropped: function(element, hoverElement, event){
+	liDropped: function(element, hoverElement){
 		this.elemTree.removeClass('drag_active');
 		this.drag.detach();
+		
 		if (hoverElement) {
 			var parentLiId, parentLi, ol;
 			var li = element.erase('style').removeClass('moved').dispose();
